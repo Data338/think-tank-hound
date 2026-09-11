@@ -39,6 +39,16 @@ export async function initializeServer(): Promise<FastMCP> {
   // Set up event handlers
   process.on("SIGINT", gracefulShutdown);
   process.on("SIGTERM", gracefulShutdown);
+
+  // Stdio mode only: if the parent harness dies, stdin closes. Shut down
+  // promptly so the owned Hound child is reaped now, not at the 120s
+  // inactivity timer. (In HTTP mode stdin state is meaningless — skip.)
+  if (process.env.MCP_TRANSPORT === "stdio" && !process.stdin.destroyed) {
+    process.stdin.on("close", () => {
+      console.error("[WARN] [core] stdin closed, parent harness gone — shutting down...");
+      gracefulShutdown();
+    });
+  }
   
   // Handle parent process disconnection (if running as a child process)
   process.on("disconnect", () => {
