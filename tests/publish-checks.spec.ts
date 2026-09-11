@@ -16,7 +16,7 @@ describe('Package Publication Checks', () => {
     expect(result.status).toBe(0);
     
     const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
-    expect(result.stderr).toContain(`mcp-think-tank v${packageJson.version}`);
+    expect(result.stderr).toContain(`think-tank-hound v${packageJson.version}`);
   });
 
   it('package files configuration is correct', () => {
@@ -27,7 +27,7 @@ describe('Package Publication Checks', () => {
     
     // Check that the actual files exist
     expect(fs.existsSync('./bin/mcp-think-tank.js')).toBe(true);
-    expect(fs.existsSync('./dist/src/server.js')).toBe(true);
+    expect(fs.existsSync('./dist/server.js')).toBe(true);
   });
 
   it('CHANGELOG.md contains entry for current version', () => {

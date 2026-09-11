@@ -7,7 +7,7 @@ import axios from 'axios';
 const FILE_TOOLS = ['read_file', 'list_dir', 'file_search'];
 
 // Tools that work with URL operations (to intercept for caching)
-const URL_TOOLS = ['web_search', 'exa_search', 'exa_answer', 'mcp_think-tool_exa_search', 'mcp_think-tool_exa_answer'];
+const URL_TOOLS = ['web_search', 'hound_search', 'hound_fetch', 'mcp_think-tool_hound_search', 'mcp_think-tool_hound_fetch'];
 
 /**
  * Creates a wrapped tool that uses the ToolManager for tracking and limits
@@ -196,9 +196,9 @@ async function handleUrlTool(
   await toolManager.callTool(agentId, toolName, params);
   
   try {
-    // Special handling for all Exa tools
-    if (toolName.includes('exa_search') || toolName.includes('exa_answer')) {
-      const result = await callExaSearch(originalExecute, params, context);
+    // Special handling for all research (Hound) tools
+    if (toolName.includes('hound_search') || toolName.includes('hound_fetch')) {
+      const result = await callResearchTool(originalExecute, params, context);
       
       // Store successful result in cache
       toolManager.setContentCacheItem(cacheKey, result);
@@ -226,7 +226,7 @@ async function handleUrlTool(
  * @param context Execution context
  * @returns Properly formatted search results
  */
-async function callExaSearch(
+async function callResearchTool(
   originalExecute: (params: any, context: any) => Promise<any>, 
   params: any, 
   context: any
@@ -247,7 +247,7 @@ async function callExaSearch(
     // Return properly formatted error JSON instead of throwing
     return JSON.stringify({
       status: 'ERROR',
-      message: `Error executing Exa search: ${error.message}`,
+      message: `Error executing research tool: ${error.message}`,
       query: params.query
     });
   } finally {

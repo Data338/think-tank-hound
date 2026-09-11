@@ -12,7 +12,8 @@ console.log = function() {
 
 // Handle version flag directly in the bin script for faster response
 if (process.argv.includes('--version')) {
-  console.error('mcp-think-tank v2.0.7');
+  const pkg = require('../package.json');
+  console.error(`${pkg.name} v${pkg.version}`);
   process.exit(0);
 }
 

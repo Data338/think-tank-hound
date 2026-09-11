@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0 (2026-09-11)
+
+### Added (fork think-tank-hound — own project, MIT, from flight505/mcp-think-tank@2.0.7)
+- Owned Hound child process over stdio (`src/hound/`): `hound_search` + `hound_fetch` as first-class tools, no TCP, no extra daemon, no orphan processes
+- `HOUND_BIN` env (isolated copy; production Hound install stays untouched), startup smoke test, graceful degrade when Hound is absent
+- `tests/hound/proxy.spec.ts`: param mapping, error envelope, spawn resolution
+
+### Removed
+- Exa backend (`src/research/`, `exa-js` dep, `exa_*` tools) — no API key required for anything
+
 ## 2.0.7 (2025-05-13)
 
 ### Fixed

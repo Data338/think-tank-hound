@@ -5,6 +5,7 @@ import { registerAllTools } from "./tools.js";
 import { setupResources } from "./resources.js";
 import { initializeProcess, cleanupProcess, ProcessInfo, createCleanupScript } from "../utils/process.js";
 import { taskStorage } from "../tasks/storage.js";
+import { closeHound } from "../hound/index.js";
 
 // Server state globals
 export const serverState = {
@@ -28,7 +29,7 @@ export async function initializeServer(): Promise<FastMCP> {
   
   // Create server instance
   const server = new FastMCP({
-    name: "MCP Think Tank",
+    name: "Think Tank Hound",
     version: config.version as `${number}.${number}.${number}`
   });
   
@@ -98,10 +99,25 @@ export function resetInactivityTimer(): void {
 }
 
 /**
- * Graceful shutdown function
+ * Graceful shutdown: async cleanup first, exit last. Never exits before
+ * the owned Hound child is reaped, otherwise it becomes an orphan.
  */
 export function gracefulShutdown() {
   console.error("[INFO] [core] Shutting down MCP Think Tank server...");
+  void (async () => {
+    try {
+      await Promise.race([
+        closeHound(),
+        new Promise((resolve) => setTimeout(resolve, 3000)),
+      ]);
+    } catch (e) {
+      console.error(`[ERROR] [core] Hound shutdown failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+    finishShutdown();
+  })();
+}
+
+function finishShutdown() {
   
   // Clear any pending timeouts in task storage
   if (taskStorage && typeof taskStorage.clearAllTimeouts === "function") {

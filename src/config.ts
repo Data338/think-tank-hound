@@ -37,7 +37,7 @@ function initializeConfig(): ServerConfig {
   if (argv.version || argv.v) {
     // We just need the version here
     const version = getVersionFromPackage();
-    console.error(`[INFO] [config] mcp-think-tank v${version}`);
+    console.error(`[INFO] [config] think-tank-hound v${version}`);
     process.exit(0);
   }
   
@@ -109,7 +109,7 @@ function getVersionFromPackage(): string {
     if (existsSync(packageJsonPath)) {
       const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
       
-      if (packageJson.name === 'mcp-think-tank' && packageJson.version) {
+      if ((packageJson.name === 'think-tank-hound' || packageJson.name === 'mcp-think-tank') && packageJson.version) {
         return packageJson.version;
       }
     }
@@ -118,18 +118,32 @@ function getVersionFromPackage(): string {
     const npxPath = resolve(process.env.npm_config_local_prefix || '', 'package.json');
     if (existsSync(npxPath)) {
       const packageJson = JSON.parse(readFileSync(npxPath, 'utf8'));
-      if (packageJson.name === 'mcp-think-tank' && packageJson.version) {
+      if ((packageJson.name === 'think-tank-hound' || packageJson.name === 'mcp-think-tank') && packageJson.version) {
         return packageJson.version;
       }
     }
     
+    // Own package.json adjacent to dist (robust when cwd is unrelated,
+    // e.g. spawned by a harness from $HOME)
+    try {
+      const ownPkg = resolve(dirname(fileURLToPath(import.meta.url)), "../../package.json");
+      if (existsSync(ownPkg)) {
+        const packageJson = JSON.parse(readFileSync(ownPkg, "utf8"));
+        if ((packageJson.name === "think-tank-hound" || packageJson.name === "mcp-think-tank") && packageJson.version) {
+          return packageJson.version;
+        }
+      }
+    } catch {
+      // fall through to fixed default
+    }
+
     // If we couldn't determine the version from package.json, use a fixed version
-    return '2.0.7';
+    return '0.1.0';
   } catch (error) {
     console.error(`[WARN] [config] Could not read version from package.json: ${error instanceof Error ? error.message : String(error)}`);
   }
   
-  return '2.0.7';
+  return '0.1.0';
 }
 
 /**

@@ -60,12 +60,12 @@ describe('MCP Think Tank Integration Checks', () => {
   });
   
   it('all key directories exist in distribution', () => {
-    const distDir = join(dirname(fileURLToPath(import.meta.url)), '../dist/src');
+    const distDir = join(dirname(fileURLToPath(import.meta.url)), '../dist');
     
     // Check for key directories that should exist
     const dirsToCheck = [
       'memory',
-      'research',
+      'hound',
       'tasks',
       'think',
       'utils'

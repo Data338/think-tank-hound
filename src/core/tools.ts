@@ -3,7 +3,8 @@ import { registerMemoryTools } from '../memory/tools.js';
 import { registerThinkTools } from '../think/tools.js';
 import { registerTaskTools } from '../tasks/tools.js';
 import { registerUtilityTools } from '../utils/tools.js';
-import { registerResearchTools } from '../research/index.js';
+import { initHound } from '../hound/index.js';
+import { registerHoundTools } from '../hound/proxy.js';
 
 /**
  * Register all tools with the server
@@ -27,9 +28,14 @@ export async function registerAllTools(server: FastMCP): Promise<void> {
     console.error('[INFO] [tools] Registering utility tools...');
     registerUtilityTools(server);
     
-    // Register research tools
-    console.error('[INFO] [tools] Registering research tools...');
-    registerResearchTools(server);
+    // Research tools (owned Hound child; graceful degrade if unavailable)
+    console.error('[INFO] [tools] Registering hound research tools...');
+    const hound = await initHound();
+    if (hound) {
+      registerHoundTools(server, hound);
+    } else {
+      console.error('[WARN] [tools] Hound child unavailable — hound_search/hound_fetch not registered');
+    }
     
     console.error('[INFO] [tools] All tools registered successfully');
   } catch (error) {
