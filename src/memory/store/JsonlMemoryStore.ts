@@ -228,8 +228,9 @@ export class JsonlMemoryStore implements MemoryStore {
       for (const observation of entity.observations) {
         let matches = true;
 
-        // Filter by keyword
-        if (keyword && !observation.text.toLowerCase().includes(keyword)) {
+        // Filter by keyword (matches observation text OR entity name,
+        // so namespaced queries like "project:fenix" hit the entity)
+        if (keyword && !observation.text.toLowerCase().includes(keyword) && !entityName.toLowerCase().includes(keyword)) {
           matches = false;
         }
 
